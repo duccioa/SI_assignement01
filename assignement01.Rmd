@@ -1,0 +1,42 @@
+We investigate the exponential distribution. With the central limit theorem we compare the theoretial population distribution with the distribution of 1000 samples of 40 exponentials.
+
+We set $\lambda$ = 0.2, therefore $\mu$ = 1/$\lambda$ and sd = 1/$\lambda$
+
+```{r}
+set.seed(100)
+#exponential distribution
+lambda <- 0.2
+exponentials <- rexp(1000, rate = lambda)
+#matrix of 1000 simulations of samples of size 40
+n_sim <- 1000
+sample_size <- 40
+m <- matrix(rexp(n_sim*sample_size, rate = lambda), nrow = n_sim, ncol = sample_size)
+#vector of 1000 averages of samples
+sample_averages <- apply(m, 1, mean)
+```
+1. Show the sample mean and compare it to the theoretical mean of the distribution.
+
+```{r}
+theoretical_mean <- 1/lambda
+mean_sample <- mean(sample_averages)
+```
+
+2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+
+```{r}
+
+
+
+```
+
+
+```{r} 
+hist(sample_averages, breaks = 50, col = "grey", prob = TRUE)
+```
+
+
+
+
+
+
+
