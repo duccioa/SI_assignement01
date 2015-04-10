@@ -1,7 +1,10 @@
+---
+output: pdf_document
+---
 # Exponential distribution in R #  
 ### Author: D.Aiazzi ###  
 ## Overview ##  
-We investigate the exponential distribution in R. With the central limit theorem we compare the theoretical population distribution simulated by 'rexp()' with the distribution of 1000 samples of 40 exponentials.  
+We investigate the exponential distribution in R. With the Central Limit Theorem (CLT) we compare the theoretical population distribution simulated by 'rexp()' with the distribution of 1000 samples of 40 exponentials.  
 In particular we want to:  
 1. Show the sample mean and compare it to the theoretical mean of the distribution.  
 2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.  
@@ -9,7 +12,7 @@ In particular we want to:
 
 ## Simulation ##
 
-We assume X to be an exponential distribution with lambda $\lambda$ = 0.2, therefore $\mu$ = 1/$\lambda$ and sd = 1/$\lambda$
+We assume X to be an exponential distribution with lambda $\lambda$ = 0.2. It follows that the theoretiacl distribution X has mean $\mu$ = 1/$\lambda$ and standard deviation sd = 1/$\lambda$
 
 ```{r, echo=FALSE}
 set.seed(100)
@@ -23,43 +26,125 @@ sample_size <- 40
 m <- matrix(rexp(n_sim*sample_size, rate = lambda), nrow = n_sim, ncol = sample_size)
 #vector of 1000 averages of samples
 sample_averages <- apply(m, 1, mean)
+
+plot(density(exponentials), 
+     lwd = 1, 
+     main = "Probability Density Function of an exponential distribution\n (lambda = 0.2)",
+     xlab = "Values",
+     ylab = "Density")
+abline(v = mean(exponentials), col = "red")
+text(x = mean(exponentials) + 5, 
+     y = 0.14,
+     col = "red", 
+     labels = "mu = 5")
 ```
-### Theoretical versus sample mean ###
+
+### 1. Theoretical versus sample mean ###
 
 In the exponential distribution the theoretical mean is $\mu$ = 1/$\lambda$, that is: 
 ```{r,echo=FALSE}
 mu <- 1/lambda
 mu
 ```
-The sample mean \bar{X} is very close to the theoretical value and it is:
+Below the distribution of the sample mean X' that is centered on the population mean, of whom is an estimate.
 ```{r,echo=FALSE}
-mean(sample_averages)
+plot(density(sample_averages), 
+     main = "Distribution of 1000 averages of samples size 40",
+     xlab = "" )
+abline(v = mean(sample_averages), col = "red")
+text(x = mean(sample_averages) + .5, 
+     y = .1, 
+     labels = paste("X' =", round(mean(sample_averages), 3), sep = " "), 
+     col = "red")
 ```
 
-### Theoretical versus sample variance ###
+### 2. Theoretical versus sample variance ###
 The theoretical variance of the exponential distribution is Var[X] = 1/$\lambda^{2}$, that is: 
 ```{r,echo=FALSE}
 1/(lambda^2)
 ```
-The sample variance Var[$\bar{X}$] is:
+The sample variance Var[X'] is:
 ```{r,echo=FALSE}
 var(sample_averages)
 ```
 
+### 3. Distribution ###
+In point 3, we will focus on the difference between the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials.
+The CLT tells us that X' ~ N($\mu$, $\sigma^2$/n), that is the averages of n samples approximates a normal distribution with mean $\mu$ and variation $\sigma^2$/n.  
+In the following plot, the distribution of the averages of samples is normalised. The histograms and blue line rapresent the normalised distribution of the averages of samples from the simulation, the green dotted line rapresents a standard normal distribution. 
 
 
-
-```{r}
+```{r, echo=FALSE}
 sample_averages_norm <- (sample_averages - mu)/var(sample_averages)#normalisation of the averages of samples
-hist(sample_averages_norm, breaks = 50, col = "grey", prob = TRUE)
+hist(sample_averages_norm, 
+     breaks = 50, 
+     col = "grey", 
+     prob = TRUE, 
+     main = "Normalised distribution of averages of samples",
+     xlab = "")
 lines(density(sample_averages_norm), col = "blue", lwd = 2)
 abline(v=mean(sample_averages_norm), col="red", lwd = 3)
-lines(density(rnorm(100000)), lty = 2, col = "darkgreen")
+lines(density(rnorm(1000000)), lty = 2, lwd = 3, col = "darkgreen")
+legend('topright', 
+       c("theoretical", "simulation"), 
+       col = c("darkgreen", "blue"), 
+       lty = c(2,1), 
+       lwd = 3, 
+       bty = "n")
 ```
 
+## Appendix ##
+### The code chunks ###
+```{r, eval=FALSE}
+####SIMULATION####
+set.seed(100)
+#exponential distribution
+lambda <- 0.2
+distr_size <- 1000
+exponentials <- rexp(distr_size, rate = lambda)
+#matrix of 1000 simulations of samples of size 40
+n_sim <- 1000
+sample_size <- 40
+m <- matrix(rexp(n_sim*sample_size, rate = lambda), nrow = n_sim, ncol = sample_size)
+#vector of 1000 averages of samples
+sample_averages <- apply(m, 1, mean)
 
+plot(density(exponentials), 
+     lwd = 2, 
+     main = "Probability Density Function of an exponential distribution\n (lambda = 0.2)",
+     xlab = "Values",
+     ylab = "Density")
+abline(v = mean(exponentials), col = "red")
+text(x = mean(exponentials) + 5, 
+     y = 0.14,
+     col = "red", 
+     labels = "mu = 5")
 
+#### 1. Theoretical versus sample mean ####
+mu <- 1/lambda
+mean(sample_averages)
 
+#### 2. Theoretical versus sample variance ####
+1/(lambda^2)
+var(sample_averages)
 
+#### 3. Distribution ####
 
+sample_averages_norm <- (sample_averages - mu)/var(sample_averages)#normalisation of the averages of samples
+hist(sample_averages_norm, 
+     breaks = 50, 
+     col = "grey", 
+     prob = TRUE, 
+     main = "Normalised distribution of averages of samples",
+     xlab = "")
+lines(density(sample_averages_norm), col = "blue", lwd = 2)
+abline(v=mean(sample_averages_norm), col="red", lwd = 3)
+lines(density(rnorm(1000000)), lty = 2, lwd = 3, col = "darkgreen")
+legend('topright', 
+       c("theoretical", "simulation"), 
+       col = c("darkgreen", "blue"), 
+       lty = c(2,1), 
+       lwd = 3, 
+       bty = "n")
+```
 
